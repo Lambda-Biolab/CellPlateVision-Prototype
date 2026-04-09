@@ -125,7 +125,7 @@ confluence = sum(r.area for r in result.predictions) / dish_area
 - Link dish images to experiments via [REST API][elabftw-guide]
 - Attach analysis results (segmentation masks, confluence CSVs)
 - Full changelog and revision tracking for reproducibility
-- [EAP4EMSIG][eap4emsig] project actively building direct eLabFTW integration
+- [EAP4EMSIG][eap4emsig] paper proposes direct eLabFTW integration
 
 ### Integration Pattern
 
