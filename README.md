@@ -1,5 +1,7 @@
 # CellPlateVision
 
+![CellPlateVision — Automated cell growth detection on Petri dishes.](.github/social-preview.png)
+
 > **Status: Prototype / Research**
 
 Automated cell culture growth detection on round Petri dishes using
