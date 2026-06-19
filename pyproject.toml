@@ -22,6 +22,7 @@ dev = [
     "ruff>=0.14.0",
     "pyright>=1.1.400",
     "complexipy>=5.5.0",
+    "requests>=2.32",  # used by scripts/download_datasets.py (dev/setup tool)
 ]
 test = [
     "pytest>=8.3",

@@ -13,8 +13,9 @@ See ``docs/prototype-roadmap.md`` for the full list, licenses, and links.
 from __future__ import annotations
 
 import sys
-import urllib.request
 from pathlib import Path
+
+import requests
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "raw"
 
@@ -51,8 +52,11 @@ def download_url(url, name="dataset"):
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     dest = DATA_DIR / f"{name}.zip"
     print(f"Downloading {url} -> {dest}")
-    with urllib.request.urlopen(url) as response, dest.open("wb") as handle:  # noqa: S310
-        handle.write(response.read())
+    response = requests.get(url, stream=True, timeout=30)
+    response.raise_for_status()
+    with dest.open("wb") as handle:
+        for chunk in response.iter_content(chunk_size=8192):
+            handle.write(chunk)
     print("Done.")
 
 
