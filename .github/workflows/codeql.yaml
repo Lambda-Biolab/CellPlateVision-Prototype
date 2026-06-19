@@ -1,0 +1,59 @@
+# https://github.blog/changelog/2025-10-28-upcoming-deprecation-of-codeql-action-v3/
+#
+# Adopted per issue #9 (qte77 newer-style pattern).
+#
+# `push:` (no branch filter) is deliberate: under `pull_request:`, codeql-action
+# uploads SARIFs against a synthetic merge-ref SHA that GitHub recomputes on every
+# push or main-move, racing the merge-protection check. `push:` uploads against the
+# real commit SHA, eliminating that race.
+#
+# The `paths:` filter and the disabled `schedule:` keep this workflow dormant while
+# the repo is docs-only (CodeQL's python analysis fails with "no source seen" when
+# there are zero .py files). It activates automatically when the first Python source
+# lands. At that point, remove the `paths:` filter and re-enable the weekly schedule.
+name: "CodeQL"
+
+on:
+  push:
+    paths:
+      - '**/*.py'
+      - '.github/workflows/codeql.yaml'
+  workflow_dispatch:
+  # Re-enable once Python source is scaffolded:
+  # schedule:
+  #   - cron: '27 11 * * 0'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v4
+      with:
+        languages: python
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v4
+
+    - name: Perform CodeQL Analysis
+      id: analyze
+      uses: github/codeql-action/analyze@v4
+      with:
+        output: sarif-results
+
+    - name: Dismiss alerts with inline suppression comments
+      uses: advanced-security/dismiss-alerts@046d6b48d2e43cf563f96f67332c47c432eff83e # v2.0.2
+      with:
+        sarif-id: ${{ steps.analyze.outputs.sarif-id }}
+        sarif-file: sarif-results
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
